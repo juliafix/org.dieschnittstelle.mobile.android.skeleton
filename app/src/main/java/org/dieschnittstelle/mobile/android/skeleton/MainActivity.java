@@ -1,23 +1,61 @@
 package org.dieschnittstelle.mobile.android.skeleton;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.dieschnittstelle.mobile.android.skeleton.model.ToDoItem;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    private ViewGroup listView;
+    private ListView listView;
+    private List<ToDoItem> items = Arrays.asList("Eins", "Zwei", "Drei", "Vier", "Fünf", "Sechs", "Sieben")
+            .stream()
+            .map(item -> new ToDoItem(item))
+            .collect(Collectors.toList());
+    private ArrayAdapter<ToDoItem> listViewAdapter;
+
     private FloatingActionButton addNewItemButton;
     private static final int CALL_DETAILVIEW_FOR_CREATE = 0;
+
+    //Adapter Klasse evtl. noch in separate Datei
+    private class ToDoItemsAdapter extends ArrayAdapter<ToDoItem> {
+        private int layoutResource;
+        public ToDoItemsAdapter(@NonNull Context context, int resource, @NonNull List<ToDoItem> objects) {
+            super(context, resource, objects);
+            this.layoutResource = resource;
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            ToDoItem currentItem = getItem(position);
+            View currentView = getLayoutInflater().inflate(this.layoutResource,null);
+            TextView todoNameText = currentView.findViewById(R.id.itemName);
+            todoNameText.setText(currentItem.getName());
+
+            return currentView;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,23 +63,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         this.listView = findViewById(R.id.listView);
+        this.listViewAdapter = new ToDoItemsAdapter(this, R.layout.activity_main_listitem, this.items);
+        this.listView.setAdapter((this.listViewAdapter));
         this.addNewItemButton = findViewById(R.id.addNewItemButton);
 
-        for (int i = 0; i < this.listView.getChildCount(); i++) {
-            TextView currentChild = (TextView) this.listView.getChildAt(i);
-            currentChild.setOnClickListener(v -> {
-                onItemSelected(currentChild.getText().toString());
-                //showFeedbackMessage(
-                //        String.format(
-                //                getResources()
-                //                        .getString(R.string.simple_message_template), currentChild.getText()));
-            });
-        }
+        this.listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ToDoItem selectedItem = listViewAdapter.getItem(position);
+                onItemSelected(selectedItem);
+            }
+        });
 
         this.addNewItemButton.setOnClickListener(v -> this.onItemCreationRequested());
     }
 
-    protected void onItemSelected(String itemName) {
+    protected void onItemSelected(ToDoItem itemName) {
         Intent detailViewIntent = new Intent(this, DetailViewActivity.class);
         detailViewIntent.putExtra(DetailViewActivity.ARG_ITEM, itemName);
         this.startActivity(detailViewIntent);
@@ -58,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CALL_DETAILVIEW_FOR_CREATE) {
             if (resultCode == Activity.RESULT_OK) {
-                this.onNewItemCreated(data.getStringExtra(DetailViewActivity.ARG_ITEM));
+                this.onNewItemCreated((ToDoItem) data.getSerializableExtra(DetailViewActivity.ARG_ITEM));
             } else {
                 showFeedbackMessage("Rückgabe von DetailView: " + requestCode);
             }
@@ -70,9 +107,13 @@ public class MainActivity extends AppCompatActivity {
         Snackbar.make(findViewById(R.id.rootView), msg, Snackbar.LENGTH_INDEFINITE).show();
     }
 
-    protected void onNewItemCreated(String itemName) {
-        TextView newItemView = (TextView) getLayoutInflater().inflate(R.layout.activity_main_listitem, null);
-        newItemView.setText(itemName);
-        this.listView.addView(newItemView);
+    protected void onNewItemCreated(ToDoItem todo) {
+        //TextView newItemView = (TextView) getLayoutInflater().inflate(R.layout.activity_main_listitem, null);
+        //newItemView.setText(itemName);
+        //this.listView.addView(newItemView);
+        this.items.add(todo);
+        this.listViewAdapter.notifyDataSetChanged();
+        //Scrollt dahin, wo das letzte Element hinzugefügt wurde
+        this.listView.setSelection(this.listViewAdapter.getPosition(todo));
     }
 }

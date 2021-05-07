@@ -10,11 +10,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.dieschnittstelle.mobile.android.skeleton.model.ToDoItem;
+
 public class DetailViewActivity extends AppCompatActivity {
 
     public static final String ARG_ITEM = "item";
     private EditText itemNameText;
-    private String item;
+    private EditText itemDescriptionText;
+    private ToDoItem item;
     private FloatingActionButton saveButton;
 
     @Override
@@ -24,25 +27,30 @@ public class DetailViewActivity extends AppCompatActivity {
 
         // 1. Bedien- und Anteigeelemente auslesen
         itemNameText = findViewById(R.id.itemName);
+        itemDescriptionText = findViewById(R.id.itemDescription);
         saveButton = findViewById(R.id.saveButton);
 
         // 2. Bedienelemente bedienbar machen
         saveButton.setOnClickListener(v -> this.onSaveItem());
 
         // 3. Ansicht mit Daten füllen
-        item = getIntent().getStringExtra(ARG_ITEM);
+        item = (ToDoItem) getIntent().getSerializableExtra(ARG_ITEM);
 
         if (item != null) {
-            itemNameText.setText(item);
+            itemNameText.setText(item.getName());
+            itemDescriptionText.setText(item.getDescription());
+        } else {
+            item = new ToDoItem();
         }
     }
 
     protected void onSaveItem() {
-        String itemName = this.itemNameText.getText().toString();
+        item.setName(this.itemNameText.getText().toString());
+        item.setDescription(this.itemDescriptionText.getText().toString());
 
         // 4. Wieder an Main zurückgeben
         Intent returnIntent = new Intent();
-        returnIntent.putExtra(ARG_ITEM, itemName);
+        returnIntent.putExtra(ARG_ITEM, item);
 
         this.setResult(Activity.RESULT_OK, returnIntent);
 
