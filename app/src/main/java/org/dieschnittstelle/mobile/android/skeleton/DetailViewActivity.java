@@ -7,48 +7,36 @@ import android.widget.EditText;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityDetailviewBinding;
 import org.dieschnittstelle.mobile.android.skeleton.model.ToDoItem;
 
 public class DetailViewActivity extends AppCompatActivity {
 
     public static final String ARG_ITEM = "item";
-    private EditText itemNameText;
-    private EditText itemDescriptionText;
     private ToDoItem item;
-    private FloatingActionButton saveButton;
+    private ActivityDetailviewBinding dataBindingHandle;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detailview);
+        //Mit Databinding muss folgendes ausgeführt werden:
+        this.dataBindingHandle = DataBindingUtil.setContentView(this, R.layout.activity_detailview);
 
-        // 1. Bedien- und Anteigeelemente auslesen
-        itemNameText = findViewById(R.id.itemName);
-        itemDescriptionText = findViewById(R.id.itemDescription);
-        saveButton = findViewById(R.id.saveButton);
-
-        // 2. Bedienelemente bedienbar machen
-        saveButton.setOnClickListener(v -> this.onSaveItem());
-
-        // 3. Ansicht mit Daten füllen
         item = (ToDoItem) getIntent().getSerializableExtra(ARG_ITEM);
 
-        if (item != null) {
-            itemNameText.setText(item.getName());
-            itemDescriptionText.setText(item.getDescription());
-        } else {
+        if (item == null) {
             item = new ToDoItem();
-        }
+            }
+
+        this.dataBindingHandle.setController(this);
+
     }
 
-    protected void onSaveItem() {
-        item.setName(this.itemNameText.getText().toString());
-        item.setDescription(this.itemDescriptionText.getText().toString());
-
-        // 4. Wieder an Main zurückgeben
+    public void onSaveItem() {
         Intent returnIntent = new Intent();
         returnIntent.putExtra(ARG_ITEM, item);
 
@@ -56,5 +44,13 @@ public class DetailViewActivity extends AppCompatActivity {
 
         finish();
 
+    }
+
+    public ToDoItem getItem() {
+        return item;
+    }
+
+    public void setItem(ToDoItem item) {
+        this.item = item;
     }
 }

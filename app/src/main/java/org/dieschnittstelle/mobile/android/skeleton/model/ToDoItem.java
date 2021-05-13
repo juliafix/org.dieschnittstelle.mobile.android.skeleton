@@ -1,12 +1,21 @@
 package org.dieschnittstelle.mobile.android.skeleton.model;
 
 import java.io.Serializable;
+import java.util.Objects;
+import java.util.UUID;
 
 public class ToDoItem implements Serializable {
+
+    protected static long ID_GENERATOR = 0;
+
+    public static long nextId() {
+        return ++ID_GENERATOR;
+    }
 
     private String name;
     private String description;
     private boolean checked;
+    private long id;
 
     public ToDoItem() {
     }
@@ -46,5 +55,26 @@ public class ToDoItem implements Serializable {
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ToDoItem toDoItem = (ToDoItem) o;
+        return id == toDoItem.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
