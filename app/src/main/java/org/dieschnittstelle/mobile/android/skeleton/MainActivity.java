@@ -9,28 +9,26 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;
+import org.dieschnittstelle.mobile.android.skeleton.model.IToDoItemCRUDOperationsAsync;
 import org.dieschnittstelle.mobile.android.skeleton.model.ToDoItem;
+import org.dieschnittstelle.mobile.android.skeleton.model.impl.RoomToDoItemCRUDOperationsImpl;
+import org.dieschnittstelle.mobile.android.skeleton.model.impl.SimpleToDoItemCRUDOperationsImpl;
+import org.dieschnittstelle.mobile.android.skeleton.model.impl.ThreadedToDoItemCRUDOperationsAsyncImpl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -43,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton addNewItemButton;
     private static final int CALL_DETAILVIEW_FOR_CREATE = 0;
     private static final int CALL_DETAILVIEW_FOR_EDIT = 1;
+
+    private IToDoItemCRUDOperationsAsync crudOperations;
 
     //Adapter Klasse evtl. noch in separate Datei
     private class ToDoItemsAdapter extends ArrayAdapter<ToDoItem> {
@@ -109,8 +109,9 @@ public class MainActivity extends AppCompatActivity {
         this.addNewItemButton.setOnClickListener(v -> this.onItemCreationRequested());
 
         //Daten aus readAllDataItems Methode in View hinzufügen
-        //listViewAdapter.addAll(readAllDataItems());
-        readAllDataItems(items -> listViewAdapter.addAll(items));
+        this.crudOperations = new ThreadedToDoItemCRUDOperationsAsyncImpl(new RoomToDoItemCRUDOperationsImpl(this), this, this.progressBar);
+
+        this.crudOperations.readAllToDoItems(items -> listViewAdapter.addAll(items));
     }
 
     protected void onItemSelected(ToDoItem itemName) {
@@ -147,57 +148,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    protected void onItemEdited(ToDoItem item) {
-        int position = this.items.indexOf(item);
-        this.items.remove(position);
-        this.items.add(position, item);
-        this.listViewAdapter.notifyDataSetChanged();
-        this.listView.setSelection(position);
+    protected void onItemEdited(ToDoItem todo) {
+        this.crudOperations.updateToDoItem(todo, updated -> {
+            int position = this.items.indexOf(updated);
+            this.items.remove(position);
+            this.items.add(position, updated);
+            this.listViewAdapter.notifyDataSetChanged();
+            this.listView.setSelection(position);
+        });
+
     }
 
     protected void showFeedbackMessage(String msg) {
-        Snackbar.make(findViewById(R.id.rootView), msg, Snackbar.LENGTH_INDEFINITE).show();
+        Snackbar.make(findViewById(R.id.rootView), msg, Snackbar.LENGTH_SHORT).show();
     }
 
     protected void onNewItemCreated(ToDoItem todo) {
-        //TextView newItemView = (TextView) getLayoutInflater().inflate(R.layout.activity_main_listitem, null);
-        //newItemView.setText(itemName);
-        //this.listView.addView(newItemView);
-        todo.setId(ToDoItem.nextId());
-        this.items.add(todo);
-        this.listViewAdapter.notifyDataSetChanged();
-        //Scrollt dahin, wo das letzte Element hinzugefügt wurde
-        this.listView.setSelection(this.listViewAdapter.getPosition(todo));
+        this.crudOperations.createToDoItem(todo, created -> {
+            this.items.add(created);
+            this.listViewAdapter.notifyDataSetChanged();
+            //Scrollt dahin, wo das letzte Element hinzugefügt wurde
+            this.listView.setSelection(this.listViewAdapter.getPosition(created));
+        });
+
     }
 
     //Hier muss Checkstatus-Update in DB vorgenommen werden
     public void onCheckedChangedInListView(ToDoItem todo) {
-        showFeedbackMessage("Checked changed to: " + todo.isChecked() + " for " + todo.getName());
+        this.crudOperations.updateToDoItem(todo, updated -> {
+            showFeedbackMessage("Checked changed to: " + updated.isChecked() + " for " + updated.getName());
+        });
     }
 
     protected void readAllDataItems(Consumer<List<ToDoItem>> onread) {
-        this.progressBar.setVisibility(View.VISIBLE);
-        new Thread(() -> {
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            List<ToDoItem>  todos = Arrays.asList("Eins", "Zwei", "Drei", "Vier", "Fünf", "Sechs", "Sieben", "Acht", "Neun", "Zehn", "Elf", "Zwölf", "Dreizeihn", "Vierzehn", "Fünfzehn", "Sechzehn")
-                    .stream()
-                    .map(item -> {
-                        ToDoItem itemobj = new ToDoItem(item);
-                        itemobj.setId(ToDoItem.nextId());
-                        return itemobj;
-                    })
-                    .collect(Collectors.toList());
-
-            runOnUiThread(() -> {
-            this.progressBar.setVisibility(View.GONE);
-            //this.listViewAdapter.addAll(todos);
-                onread.accept(todos);
-            });
-        }).start();
 
     }
 }

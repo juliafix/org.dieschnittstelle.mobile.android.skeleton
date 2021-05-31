@@ -1,9 +1,12 @@
 package org.dieschnittstelle.mobile.android.skeleton.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.UUID;
 
+@Entity
 public class ToDoItem implements Serializable {
 
     protected static long ID_GENERATOR = 0;
@@ -15,6 +18,8 @@ public class ToDoItem implements Serializable {
     private String name;
     private String description;
     private boolean checked;
+
+    @PrimaryKey(autoGenerate = true)
     private long id;
 
     public ToDoItem() {
