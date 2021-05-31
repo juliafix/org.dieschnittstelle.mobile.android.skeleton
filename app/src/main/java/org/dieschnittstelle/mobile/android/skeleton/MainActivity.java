@@ -3,6 +3,7 @@ package org.dieschnittstelle.mobile.android.skeleton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,31 +15,30 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;
 import org.dieschnittstelle.mobile.android.skeleton.model.ToDoItem;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private ListView listView;
-    private List<ToDoItem> items = Arrays.asList("Eins", "Zwei", "Drei", "Vier", "Fünf", "Sechs", "Sieben")
-            .stream()
-            .map(item -> {
-                ToDoItem itemobj = new ToDoItem(item);
-                itemobj.setId(ToDoItem.nextId());
-                return itemobj;
-            })
-            .collect(Collectors.toList());
+    private List<ToDoItem> items = new ArrayList<>();
     private ArrayAdapter<ToDoItem> listViewAdapter;
+    private ProgressBar progressBar;
 
     private FloatingActionButton addNewItemButton;
     private static final int CALL_DETAILVIEW_FOR_CREATE = 0;
@@ -55,13 +55,35 @@ public class MainActivity extends AppCompatActivity {
 
         @NonNull
         @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            ToDoItem currentItem = getItem(position);
-            View currentView = getLayoutInflater().inflate(this.layoutResource, null);
-            TextView todoNameText = currentView.findViewById(R.id.itemName);
-            todoNameText.setText(currentItem.getName());
+        public View getView(int position, @Nullable View recyclableItemView, @NonNull ViewGroup parent) {
 
-            return currentView;
+            View itemView = null;
+            ToDoItem currentItem = getItem(position);
+
+            if (recyclableItemView != null) {
+                View textView = recyclableItemView.findViewById(R.id.itemName);
+                if (textView != null) {
+
+                }
+                itemView = recyclableItemView;
+                ActivityMainListitemBinding recycledBinding = (ActivityMainListitemBinding) itemView.getTag();
+                recycledBinding.setItem(currentItem);
+            } else {
+                ActivityMainListitemBinding currentBinding =
+                        DataBindingUtil.inflate(getLayoutInflater(),
+                                this.layoutResource,
+                                null,
+                                false);
+                currentBinding.setItem(currentItem);
+                currentBinding.setController(MainActivity.this);
+
+                itemView = currentBinding.getRoot();
+                itemView.setTag(currentBinding);
+
+            }
+
+            return itemView;
+
         }
     }
 
@@ -73,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
         this.listView = findViewById(R.id.listView);
         this.listViewAdapter = new ToDoItemsAdapter(this, R.layout.activity_main_listitem, this.items);
         this.listView.setAdapter((this.listViewAdapter));
+        this.progressBar = findViewById(R.id.progressBar);
         this.addNewItemButton = findViewById(R.id.addNewItemButton);
 
         this.listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -84,6 +107,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         this.addNewItemButton.setOnClickListener(v -> this.onItemCreationRequested());
+
+        //Daten aus readAllDataItems Methode in View hinzufügen
+        //listViewAdapter.addAll(readAllDataItems());
+        readAllDataItems(items -> listViewAdapter.addAll(items));
     }
 
     protected void onItemSelected(ToDoItem itemName) {
@@ -141,5 +168,36 @@ public class MainActivity extends AppCompatActivity {
         this.listViewAdapter.notifyDataSetChanged();
         //Scrollt dahin, wo das letzte Element hinzugefügt wurde
         this.listView.setSelection(this.listViewAdapter.getPosition(todo));
+    }
+
+    //Hier muss Checkstatus-Update in DB vorgenommen werden
+    public void onCheckedChangedInListView(ToDoItem todo) {
+        showFeedbackMessage("Checked changed to: " + todo.isChecked() + " for " + todo.getName());
+    }
+
+    protected void readAllDataItems(Consumer<List<ToDoItem>> onread) {
+        this.progressBar.setVisibility(View.VISIBLE);
+        new Thread(() -> {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            List<ToDoItem>  todos = Arrays.asList("Eins", "Zwei", "Drei", "Vier", "Fünf", "Sechs", "Sieben", "Acht", "Neun", "Zehn", "Elf", "Zwölf", "Dreizeihn", "Vierzehn", "Fünfzehn", "Sechzehn")
+                    .stream()
+                    .map(item -> {
+                        ToDoItem itemobj = new ToDoItem(item);
+                        itemobj.setId(ToDoItem.nextId());
+                        return itemobj;
+                    })
+                    .collect(Collectors.toList());
+
+            runOnUiThread(() -> {
+            this.progressBar.setVisibility(View.GONE);
+            //this.listViewAdapter.addAll(todos);
+                onread.accept(todos);
+            });
+        }).start();
+
     }
 }
