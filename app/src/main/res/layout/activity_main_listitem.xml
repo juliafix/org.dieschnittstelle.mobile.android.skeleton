@@ -18,7 +18,7 @@
         android:checked="@={item.checked}"
         android:layout_gravity="center_vertical"
         android:focusable="false"
-        android:id="@+id/itemCheckde"
+        android:id="@+id/itemChecked"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <TextView
@@ -28,5 +28,23 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:textSize="24sp"/>
+    <CheckBox
+        android:onClick="@{() -> controller.onCheckedChangedInListView(item)}"
+        android:checked="@={item.favourite}"
+        android:layout_gravity="center_vertical"
+        android:focusable="false"
+        android:id="@+id/itemFavourite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="?android:attr/starStyle"/>
+    <TextView
+        android:id="@+id/expirationDate"
+        android:text="@{item.expirationDateTimeString}"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:textSize="18sp"
+        android:layout_marginTop="5px"
+        android:layout_below="@+id/itemName"/>
 </LinearLayout>
 </layout>

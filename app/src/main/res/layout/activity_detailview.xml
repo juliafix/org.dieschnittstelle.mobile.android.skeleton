@@ -31,19 +31,28 @@
 
         <CheckBox
             android:id="@+id/itemChecked"
-            android:text="Als erledigt markiert"
+            android:text="Als erledigt markieren"
             android:checked="@={controller.item.checked}"
             app:layout_constraintTop_toBottomOf="@id/itemNameWrapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+        <CheckBox
+            android:id="@+id/itemFavourite"
+            android:text="Als Favorit markieren"
+            android:checked="@={controller.item.favourite}"
+            app:layout_constraintTop_toBottomOf="@id/itemChecked"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="?android:attr/starStyle"/>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/itemDescriptionWrapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Description"
+            android:hint="Beschreibung"
             app:hintEnabled="true"
-            app:layout_constraintTop_toBottomOf="@id/itemChecked">
+            app:layout_constraintTop_toBottomOf="@id/itemFavourite">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/itemDescription"
@@ -54,6 +63,27 @@
                 android:lines="10"
                 android:minLines="5"
                 android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/itemExpirationDateWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Fälligkeitsdatum"
+            android:onClick="openDatePicker"
+            app:hintEnabled="true"
+            app:layout_constraintTop_toBottomOf="@id/itemDescriptionWrapper">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/itemExpirationDate"
+                android:text="@={controller.item.expirationDateTimeString}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:lines="10"
+                android:minLines="5"
+                android:singleLine="true" />
+
         </com.google.android.material.textfield.TextInputLayout>
 
 

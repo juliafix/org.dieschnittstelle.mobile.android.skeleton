@@ -20,10 +20,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;
+import org.dieschnittstelle.mobile.android.skeleton.model.IToDoItemCRUDOperations;
 import org.dieschnittstelle.mobile.android.skeleton.model.IToDoItemCRUDOperationsAsync;
 import org.dieschnittstelle.mobile.android.skeleton.model.ToDoItem;
-import org.dieschnittstelle.mobile.android.skeleton.model.impl.RoomToDoItemCRUDOperationsImpl;
-import org.dieschnittstelle.mobile.android.skeleton.model.impl.SimpleToDoItemCRUDOperationsImpl;
 import org.dieschnittstelle.mobile.android.skeleton.model.impl.ThreadedToDoItemCRUDOperationsAsyncImpl;
 
 import java.util.ArrayList;
@@ -109,7 +108,8 @@ public class MainActivity extends AppCompatActivity {
         this.addNewItemButton.setOnClickListener(v -> this.onItemCreationRequested());
 
         //Daten aus readAllDataItems Methode in View hinzufügen
-        this.crudOperations = new ThreadedToDoItemCRUDOperationsAsyncImpl(new RoomToDoItemCRUDOperationsImpl(this), this, this.progressBar);
+        IToDoItemCRUDOperations crudExecutor = ((ToDoItemApplication)this.getApplication()).getCRUDOperations();
+        this.crudOperations = new ThreadedToDoItemCRUDOperationsAsyncImpl(crudExecutor, this, this.progressBar);
 
         this.crudOperations.readAllToDoItems(items -> listViewAdapter.addAll(items));
     }
@@ -177,6 +177,12 @@ public class MainActivity extends AppCompatActivity {
     public void onCheckedChangedInListView(ToDoItem todo) {
         this.crudOperations.updateToDoItem(todo, updated -> {
             showFeedbackMessage("Checked changed to: " + updated.isChecked() + " for " + updated.getName());
+        });
+    }
+
+    public void onFavouriteChangedInListView(ToDoItem todo) {
+        this.crudOperations.updateToDoItem(todo, updated -> {
+            showFeedbackMessage("Favourtie changed to: " + updated.isFavourite() + " for " + updated.getName());
         });
     }
 
