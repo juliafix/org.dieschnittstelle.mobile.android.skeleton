@@ -1,8 +1,5 @@
 package org.dieschnittstelle.mobile.android.skeleton.model;
 
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
@@ -12,8 +9,6 @@ import com.google.gson.annotations.SerializedName;
 import org.dieschnittstelle.mobile.android.skeleton.util.DateConverter;
 
 import java.io.Serializable;
-import java.time.Instant;
-import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -35,7 +30,7 @@ public class ToDoItem implements Serializable {
     private boolean favourite;
 
     @SerializedName("expiry")
-    private Date expirationDateTime;
+    private String expirationDateTime;
 
     @PrimaryKey(autoGenerate = true)
     private long id;
@@ -96,23 +91,11 @@ public class ToDoItem implements Serializable {
         this.favourite = favourite;
     }
 
-    public String getExpirationDateTimeString() {
-        if (expirationDateTime!= null) {
-            return expirationDateTime.toString();
-        }
-        return "";
-    }
-
-    public Date getExpirationDateTime() {
+    public String getExpirationDateTime() {
         return expirationDateTime;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public void setExpirationDateTimeString(String expirationDateTime) {
-        this.expirationDateTime = Date.from(Instant.parse(expirationDateTime));
-    }
-
-    public void setExpirationDateTime(Date expirationDateTime) {
+    public void setExpirationDateTime(String expirationDateTime) {
         this.expirationDateTime = expirationDateTime;
     }
 

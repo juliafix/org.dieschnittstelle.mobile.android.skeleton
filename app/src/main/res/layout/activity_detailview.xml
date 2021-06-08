@@ -70,19 +70,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Fälligkeitsdatum"
-            android:onClick="openDatePicker"
             app:hintEnabled="true"
             app:layout_constraintTop_toBottomOf="@id/itemDescriptionWrapper">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/itemExpirationDate"
-                android:text="@={controller.item.expirationDateTimeString}"
+                android:text="@={controller.item.expirationDateTime}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="start"
                 android:lines="10"
                 android:minLines="5"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:focusableInTouchMode="false"/>
+            <Button
+                android:id="@+id/dateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Datum wählen"
+                android:onClick="openDatePicker" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
