@@ -9,6 +9,8 @@ import com.google.gson.annotations.SerializedName;
 import org.dieschnittstelle.mobile.android.skeleton.util.DateConverter;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -30,7 +32,7 @@ public class ToDoItem implements Serializable {
     private boolean favourite;
 
     @SerializedName("expiry")
-    private String expirationDateTime;
+    private long expirationDateTime;
 
     @PrimaryKey(autoGenerate = true)
     private long id;
@@ -91,12 +93,37 @@ public class ToDoItem implements Serializable {
         this.favourite = favourite;
     }
 
-    public String getExpirationDateTime() {
+    public long getExpirationDateTime() {
         return expirationDateTime;
     }
 
-    public void setExpirationDateTime(String expirationDateTime) {
+    public void setExpirationDateTime(long expirationDateTime) {
         this.expirationDateTime = expirationDateTime;
+    }
+
+    public String getExpirationDateTimeString() {
+        if (expirationDateTime == 0) {
+            return "-";
+        }
+        SimpleDateFormat datetimeformatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+        return datetimeformatter.format(new Date(expirationDateTime)) + " Uhr";
+    }
+
+    public void setDate(int day, int month, int year) {
+        Date current = new Date(expirationDateTime);
+        current.setDate(day);
+        current.setMonth(month);
+        current.setYear(year - 1900);
+
+        expirationDateTime = current.getTime();
+    }
+
+    public void setTime(int hours, int minutes) {
+        Date current = new Date(expirationDateTime);
+        current.setHours(hours);
+        current.setMinutes(minutes);
+
+        expirationDateTime = current.getTime();
     }
 
     @Override

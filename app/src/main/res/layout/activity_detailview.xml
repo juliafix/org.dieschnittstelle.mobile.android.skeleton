@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
             name="controller"
             type="org.dieschnittstelle.mobile.android.skeleton.DetailViewActivity" />
     </data>
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -25,7 +25,6 @@
                 android:layout_height="wrap_content"
                 android:singleLine="true">
 
-                <requestFocus />
             </com.google.android.material.textfield.TextInputEditText>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -69,13 +68,13 @@
             android:id="@+id/itemExpirationDateWrapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Fälligkeitsdatum"
+            android:hint="Fälligkeitsdatum und Zeit"
             app:hintEnabled="true"
             app:layout_constraintTop_toBottomOf="@id/itemDescriptionWrapper">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/itemExpirationDate"
-                android:text="@={controller.item.expirationDateTime}"
+                android:id="@+id/itemExpirationDateTime"
+                android:text="@{controller.item.expirationDateTimeString}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="start"
@@ -88,7 +87,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Datum wählen"
-                android:onClick="openDatePicker" />
+                android:onClick="openDatePicker"/>
+
+            <Button
+                android:id="@+id/timeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="openTimePicker"
+                android:orientation="vertical"
+                android:text="Zeit wählen" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
