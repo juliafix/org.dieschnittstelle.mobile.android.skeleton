@@ -1,0 +1,12 @@
+127.0.0.1 - - [13/Jun/2021:15:54:10 +0200] GET /api/todos HTTP/1.1 200 546 http-bio-8080-exec-1 340
+0:0:0:0:0:0:0:1 - - [13/Jun/2021:15:54:29 +0200] GET /api/todos HTTP/1.1 200 546 http-bio-8080-exec-3 10
+0:0:0:0:0:0:0:1 - - [13/Jun/2021:15:54:36 +0200] DELETE /api/todos/19 HTTP/1.1 200 4 http-bio-8080-exec-5 6
+0:0:0:0:0:0:0:1 - - [13/Jun/2021:15:54:36 +0200] DELETE /api/todos/20 HTTP/1.1 200 4 http-bio-8080-exec-6 2
+127.0.0.1 - - [13/Jun/2021:16:02:40 +0200] GET /api/todos HTTP/1.1 200 251 http-bio-8080-exec-8 1
+127.0.0.1 - - [13/Jun/2021:16:24:31 +0200] GET /api/todos HTTP/1.1 200 251 http-bio-8080-exec-10 2
+127.0.0.1 - - [13/Jun/2021:16:40:59 +0200] GET /api/todos HTTP/1.1 200 251 http-bio-8080-exec-2 2
+127.0.0.1 - - [13/Jun/2021:16:42:26 +0200] GET /api/todos HTTP/1.1 200 251 http-bio-8080-exec-5 4
+127.0.0.1 - - [13/Jun/2021:16:48:52 +0200] GET /api/todos HTTP/1.1 200 251 http-bio-8080-exec-4 2
+127.0.0.1 - - [13/Jun/2021:16:50:04 +0200] GET /api/todos HTTP/1.1 200 251 http-bio-8080-exec-8 2
+0:0:0:0:0:0:0:1 - - [13/Jun/2021:16:58:15 +0200] GET / HTTP/1.1 304 - http-bio-8080-exec-1 5
+0:0:0:0:0:0:0:1 - - [13/Jun/2021:16:58:15 +0200] GET /api/todos HTTP/1.1 200 251 http-bio-8080-exec-1 3

@@ -6,10 +6,12 @@ import androidx.room.TypeConverters;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.dieschnittstelle.mobile.android.skeleton.model.impl.RoomLocalToDoItemCRUDOperationsImpl;
 import org.dieschnittstelle.mobile.android.skeleton.util.DateConverter;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
@@ -33,6 +35,10 @@ public class ToDoItem implements Serializable {
 
     @SerializedName("expiry")
     private long expirationDateTime;
+
+    @SerializedName("contacts")
+    @TypeConverters({RoomLocalToDoItemCRUDOperationsImpl.ArrayListToStringDatabaseConverter.class})
+    private ArrayList<String> contacts;
 
     @PrimaryKey(autoGenerate = true)
     private long id;
@@ -124,6 +130,17 @@ public class ToDoItem implements Serializable {
         current.setMinutes(minutes);
 
         expirationDateTime = current.getTime();
+    }
+
+    public ArrayList<String> getContacts() {
+        if (this.contacts == null) {
+            this.contacts = new ArrayList<>();
+        }
+        return contacts;
+    }
+
+    public void setContacts(ArrayList<String> contacts) {
+        this.contacts = contacts;
     }
 
     @Override
