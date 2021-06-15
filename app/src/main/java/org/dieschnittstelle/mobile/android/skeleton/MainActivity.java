@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.dieschnittstelle.mobile.android.skeleton.adapter.ToDoItemsAdapter;
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;
 import org.dieschnittstelle.mobile.android.skeleton.model.IToDoItemCRUDOperations;
 import org.dieschnittstelle.mobile.android.skeleton.model.IToDoItemCRUDOperationsAsync;
@@ -43,56 +44,13 @@ public class MainActivity extends AppCompatActivity {
 
     private IToDoItemCRUDOperationsAsync crudOperations;
 
-    //Adapter Klasse evtl. noch in separate Datei
-    private class ToDoItemsAdapter extends ArrayAdapter<ToDoItem> {
-        private int layoutResource;
-
-        public ToDoItemsAdapter(@NonNull Context context, int resource, @NonNull List<ToDoItem> objects) {
-            super(context, resource, objects);
-            this.layoutResource = resource;
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, @Nullable View recyclableItemView, @NonNull ViewGroup parent) {
-
-            View itemView = null;
-            ToDoItem currentItem = getItem(position);
-
-            if (recyclableItemView != null) {
-                View textView = recyclableItemView.findViewById(R.id.itemName);
-                if (textView != null) {
-
-                }
-                itemView = recyclableItemView;
-                ActivityMainListitemBinding recycledBinding = (ActivityMainListitemBinding) itemView.getTag();
-                recycledBinding.setItem(currentItem);
-            } else {
-                ActivityMainListitemBinding currentBinding =
-                        DataBindingUtil.inflate(getLayoutInflater(),
-                                this.layoutResource,
-                                null,
-                                false);
-                currentBinding.setItem(currentItem);
-                currentBinding.setController(MainActivity.this);
-
-                itemView = currentBinding.getRoot();
-                itemView.setTag(currentBinding);
-
-            }
-
-            return itemView;
-
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         this.listView = findViewById(R.id.listView);
-        this.listViewAdapter = new ToDoItemsAdapter(this, R.layout.activity_main_listitem, this.items);
+        this.listViewAdapter = new ToDoItemsAdapter(this, R.layout.activity_main_listitem, this.items, this);
         this.listView.setAdapter((this.listViewAdapter));
         this.progressBar = findViewById(R.id.progressBar);
         this.addNewItemButton = findViewById(R.id.addNewItemButton);

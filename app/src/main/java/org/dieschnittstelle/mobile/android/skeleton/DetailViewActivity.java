@@ -28,12 +28,15 @@ import androidx.databinding.DataBindingUtil;
 
 import com.google.android.material.textfield.TextInputEditText;
 
+import org.dieschnittstelle.mobile.android.skeleton.adapter.ContactsAdapter;
 import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityDetailviewBinding;
+import org.dieschnittstelle.mobile.android.skeleton.model.Contact;
 import org.dieschnittstelle.mobile.android.skeleton.model.ToDoItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class DetailViewActivity extends AppCompatActivity {
 
@@ -43,18 +46,16 @@ public class DetailViewActivity extends AppCompatActivity {
     private DatePickerDialog datePickerDialog;
     private TextInputEditText dateTimeText;
     private Button openDatePicker;
-    private Button openTimePicker;
     public static final int PICK_CONTACT = 0;
-    private ArrayList<String> displayNames = new ArrayList<>();
+    private ArrayList<Contact> contacts = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Mit Databinding muss folgendes ausgeführt werden:
+
         this.dataBindingHandle = DataBindingUtil.setContentView(this, R.layout.activity_detailview);
         dateTimeText = findViewById(R.id.itemExpirationDateTime);
         openDatePicker = findViewById(R.id.dateButton);
-        openTimePicker = findViewById(R.id.timeButton);
 
         todo = (ToDoItem) getIntent().getSerializableExtra(ARG_ITEM);
 
@@ -144,24 +145,55 @@ public class DetailViewActivity extends AppCompatActivity {
 
     public void showContactDetailsForInternalId(long id) {
         ListView contactList = findViewById(R.id.contactList);
-        ArrayAdapter<String> listAdapter;
+        ArrayAdapter<Contact> listAdapter;
 
-        Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, ContactsContract.Contacts._ID + "=?", new String[]{String.valueOf(id)}, null);
-        while (cursor.moveToNext()) {
-            String displayName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-            displayNames.add(displayName);
-            Log.i("DetailViewActivity", "Anzeigename gefunden: " + displayName);
+        Cursor cursorName = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, ContactsContract.Contacts._ID + "=?", new String[]{String.valueOf(id)}, null);
+        Cursor cursorNumber = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?", new String[]{String.valueOf(id)}, null);
+        Cursor cursorEmail = getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?", new String[]{String.valueOf(id)}, null);
+        while (cursorName.moveToNext()) {
+            Contact newContact = new Contact();
+            String displayName = cursorName.getString(cursorName.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+            newContact.setName(displayName);
+            newContact.setId(id);
+            while(cursorNumber.moveToNext()) {
+                String number = cursorNumber.getString(cursorNumber.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+                if (newContact.getNumbers() != null) {
+                    if(number != "" || number != null) {
+                        newContact.getNumbers().add(number);
+                    }
+                } else {
+                    newContact.setNumbers(new ArrayList<String>());
+                    if(number != "" || number != null) {
+                        newContact.getNumbers().add(number);
+                    }
+                }
+
+            }
+
+            while(cursorEmail.moveToNext()) {
+                String email = cursorEmail.getString(cursorEmail.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS));
+
+                if (newContact.getEmails() != null) {
+                    if(email != "" || email != null) {
+                        newContact.getEmails().add(email);
+                    }
+                } else {
+                    newContact.setEmails(new ArrayList<String>());
+                    if(email != "" || email != null) {
+                        newContact.getEmails().add(email);
+                    }
+                }
+
+            }
+
+
+            contacts.add(newContact);
+            Log.i("DetailViewActivity", "E-Mail gefunden: " + displayName);
         }
-        listAdapter = new ArrayAdapter<String>(this, R.layout.activity_detailview_contact_listitem, displayNames);
+        listAdapter = new ContactsAdapter(this, R.layout.activity_detailview_contact_listitem, contacts, this);
         contactList.setAdapter(listAdapter);
 
-        cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?", new String[]{String.valueOf(id)}, null);
-        while(cursor.moveToNext()) {
-            String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            int phoneNumberType = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
-
-            Log.i("DetailViewActivity", "Nummer des Kontakts " + number + " Typ: " + phoneNumberType);
-        }
     }
 
 
@@ -171,6 +203,7 @@ public class DetailViewActivity extends AppCompatActivity {
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 todo.setDate(dayOfMonth, month, year);
                 dateTimeText.setText(todo.getExpirationDateTimeString());
+                openTimePicker(view);
 
             }
         };
@@ -233,6 +266,5 @@ public class DetailViewActivity extends AppCompatActivity {
         }, hour, min, true);
         timePickerDialog.show();
     }
-
 
 }

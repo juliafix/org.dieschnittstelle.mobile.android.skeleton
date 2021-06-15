@@ -83,20 +83,13 @@
                 android:minLines="5"
                 android:singleLine="true"
                 android:focusableInTouchMode="false"/>
+
             <Button
                 android:id="@+id/dateButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Datum wählen"
+                android:text="Datum und Uhrzeit wählen"
                 android:onClick="openDatePicker"/>
-
-            <Button
-                android:id="@+id/timeButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="openTimePicker"
-                android:orientation="vertical"
-                android:text="Zeit wählen" />
 
             <TextView
                 android:id="@+id/contacts"
