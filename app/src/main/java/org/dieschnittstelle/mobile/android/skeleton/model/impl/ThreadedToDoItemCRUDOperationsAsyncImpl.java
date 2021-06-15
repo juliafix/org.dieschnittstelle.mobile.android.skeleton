@@ -67,6 +67,9 @@ public class ThreadedToDoItemCRUDOperationsAsyncImpl implements IToDoItemCRUDOpe
 
     @Override
     public void deleteToDoItem(long id, Consumer<Boolean> ondeleted) {
-
+        new Thread(() -> {
+            boolean deleted = crudExecutor.deleteToDoItem(id);
+            this.uiThreadProvider.runOnUiThread(() -> ondeleted.accept(deleted));
+        }).start();
     }
 }

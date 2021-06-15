@@ -156,7 +156,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
                 AlertDialog deleteContact = new AlertDialog.Builder(controller)
                         // set message, title, and icon
                         .setTitle("Kontakt entfernen")
-                        .setMessage("Möchtest du den verknüpften Kontakt " + currentContact.getName() + " wirklich entfernen?")
+                        .setMessage("Möchtest du den verknüpften Kontakt " + "'" + currentContact.getName() + "'" +" wirklich entfernen?")
 
                         .setPositiveButton("Entfernen", new DialogInterface.OnClickListener() {
 

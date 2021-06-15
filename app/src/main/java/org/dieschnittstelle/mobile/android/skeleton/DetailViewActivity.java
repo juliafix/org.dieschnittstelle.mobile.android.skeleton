@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -36,11 +37,11 @@ import org.dieschnittstelle.mobile.android.skeleton.model.ToDoItem;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 public class DetailViewActivity extends AppCompatActivity {
 
     public static final String ARG_ITEM = "item";
+    public static final String DELETED = "deleted";
     private ToDoItem todo;
     private ActivityDetailviewBinding dataBindingHandle;
     private DatePickerDialog datePickerDialog;
@@ -101,7 +102,8 @@ public class DetailViewActivity extends AppCompatActivity {
             this.selectContact();
             return true;
         } else if (item.getItemId() == R.id.deleteToDo) {
-            //ToDo löschen
+            this.deleteToDo();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -109,6 +111,36 @@ public class DetailViewActivity extends AppCompatActivity {
     protected void selectContact() {
         Intent selectContactIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
         startActivityForResult(selectContactIntent, PICK_CONTACT);
+    }
+
+    protected void deleteToDo() {
+                AlertDialog deleteContact = new AlertDialog.Builder(this)
+                // set message, title, and icon
+                .setTitle("ToDo löschen")
+                .setMessage("Möchtest du das ToDo " + "'" + todo.getName() + "'" +  " wirklich löschen?")
+
+                .setPositiveButton("Löschen", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        Intent returnIntent = new Intent();
+                        returnIntent.putExtra(ARG_ITEM, todo);
+                        returnIntent.putExtra(DELETED, true);
+
+                        setResult(Activity.RESULT_OK, returnIntent);
+
+                        finish();
+                    }
+
+                })
+                .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+                    }
+                })
+                .create();
+
+        deleteContact.show();
     }
 
     @Override

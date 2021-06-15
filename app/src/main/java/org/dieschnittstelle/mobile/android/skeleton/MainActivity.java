@@ -96,8 +96,13 @@ public class MainActivity extends AppCompatActivity {
         } else if (requestCode == CALL_DETAILVIEW_FOR_EDIT) {
             if (resultCode == Activity.RESULT_OK) {
                 ToDoItem editedItem = (ToDoItem) data.getSerializableExtra((DetailViewActivity.ARG_ITEM));
+                boolean isDeleted = data.getBooleanExtra(DetailViewActivity.DELETED, false);
                 showFeedbackMessage("Aktualisiertes ToDo: " + editedItem.getName());
-                this.onItemEdited(editedItem);
+                if (isDeleted) {
+                    this.onItemDeleted(editedItem);
+                } else {
+                    this.onItemEdited(editedItem);
+                }
             } else {
                 showFeedbackMessage("Rückgabe von DetailView (Edit) mit: " + requestCode);
             }
@@ -117,6 +122,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    protected void onItemDeleted(ToDoItem todo) {
+        this.crudOperations.deleteToDoItem(todo.getId(), deleted -> {
+            int position = this.items.indexOf(todo);
+            this.items.remove(position);
+            this.listViewAdapter.notifyDataSetChanged();
+            this.listView.setSelection(position);
+        });
+    }
+
     protected void showFeedbackMessage(String msg) {
         Snackbar.make(findViewById(R.id.rootView), msg, Snackbar.LENGTH_SHORT).show();
     }
@@ -131,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //Hier muss Checkstatus-Update in DB vorgenommen werden
     public void onCheckedChangedInListView(ToDoItem todo) {
         this.crudOperations.updateToDoItem(todo, updated -> {
             showFeedbackMessage("Checked changed to: " + updated.isChecked() + " for " + updated.getName());
