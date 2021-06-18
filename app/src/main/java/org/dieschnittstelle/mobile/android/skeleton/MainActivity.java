@@ -3,14 +3,14 @@ package org.dieschnittstelle.mobile.android.skeleton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -20,37 +20,42 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.dieschnittstelle.mobile.android.skeleton.adapter.ToDoItemsAdapter;
-import org.dieschnittstelle.mobile.android.skeleton.databinding.ActivityMainListitemBinding;
 import org.dieschnittstelle.mobile.android.skeleton.model.IToDoItemCRUDOperations;
 import org.dieschnittstelle.mobile.android.skeleton.model.IToDoItemCRUDOperationsAsync;
 import org.dieschnittstelle.mobile.android.skeleton.model.ToDoItem;
 import org.dieschnittstelle.mobile.android.skeleton.model.impl.ThreadedToDoItemCRUDOperationsAsyncImpl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.function.Consumer;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private ListView listView;
-    private List<ToDoItem> items = new ArrayList<>();
-    private ArrayAdapter<ToDoItem> listViewAdapter;
-    private ProgressBar progressBar;
-
-    private FloatingActionButton addNewItemButton;
     private static final int CALL_DETAILVIEW_FOR_CREATE = 0;
     private static final int CALL_DETAILVIEW_FOR_EDIT = 1;
-
+    private ListView listView;
+    private List<ToDoItem> toDoItems = new ArrayList<>();
+    private ArrayAdapter<ToDoItem> listViewAdapter;
+    private ProgressBar progressBar;
+    private FloatingActionButton addNewItemButton;
     private IToDoItemCRUDOperationsAsync crudOperations;
+    private String sortMethod = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        // !! Wenn Server nicht erreichbar, soll LoginActivity nicht aufgerufen werden -> muss dann in LoginActivity eingefügt werden
+        //if (!((ToDoItemApplication)getApplication()).isServerAvailable()) {
+        //    startActivity(new Intent(this, DetailViewActivity.class));
+        //    return;
+        //}
+
         setContentView(R.layout.activity_main);
         this.listView = findViewById(R.id.listView);
-        this.listViewAdapter = new ToDoItemsAdapter(this, R.layout.activity_main_listitem, this.items, this);
+        this.listViewAdapter = new ToDoItemsAdapter(this, R.layout.activity_main_listitem, this.toDoItems, this);
         this.listView.setAdapter((this.listViewAdapter));
         this.progressBar = findViewById(R.id.progressBar);
         this.addNewItemButton = findViewById(R.id.addNewItemButton);
@@ -66,10 +71,13 @@ public class MainActivity extends AppCompatActivity {
         this.addNewItemButton.setOnClickListener(v -> this.onItemCreationRequested());
 
         //Daten aus readAllDataItems Methode in View hinzufügen
-        IToDoItemCRUDOperations crudExecutor = ((ToDoItemApplication)this.getApplication()).getCRUDOperations();
+        IToDoItemCRUDOperations crudExecutor = ((ToDoItemApplication) this.getApplication()).getCRUDOperations();
         this.crudOperations = new ThreadedToDoItemCRUDOperationsAsyncImpl(crudExecutor, this, this.progressBar);
 
-        this.crudOperations.readAllToDoItems(items -> listViewAdapter.addAll(items));
+        this.crudOperations.readAllToDoItems(toDoItems -> {
+            sortToDos(toDoItems, sortMethod);
+            listViewAdapter.addAll(toDoItems);
+        });
     }
 
     protected void onItemSelected(ToDoItem itemName) {
@@ -113,19 +121,18 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onItemEdited(ToDoItem todo) {
         this.crudOperations.updateToDoItem(todo, updated -> {
-            int position = this.items.indexOf(updated);
-            this.items.remove(position);
-            this.items.add(position, updated);
-            this.listViewAdapter.notifyDataSetChanged();
-            this.listView.setSelection(position);
+            int position = this.toDoItems.indexOf(updated);
+            this.toDoItems.remove(position);
+            this.toDoItems.add(position, updated);
+            this.sortListAndScrollToItem(updated, sortMethod);
         });
 
     }
 
     protected void onItemDeleted(ToDoItem todo) {
         this.crudOperations.deleteToDoItem(todo.getId(), deleted -> {
-            int position = this.items.indexOf(todo);
-            this.items.remove(position);
+            int position = this.toDoItems.indexOf(todo);
+            this.toDoItems.remove(position);
             this.listViewAdapter.notifyDataSetChanged();
             this.listView.setSelection(position);
         });
@@ -137,27 +144,62 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onNewItemCreated(ToDoItem todo) {
         this.crudOperations.createToDoItem(todo, created -> {
-            this.items.add(created);
-            this.listViewAdapter.notifyDataSetChanged();
-            //Scrollt dahin, wo das letzte Element hinzugefügt wurde
-            this.listView.setSelection(this.listViewAdapter.getPosition(created));
+            this.toDoItems.add(created);
+            this.sortListAndScrollToItem(created, sortMethod);
         });
 
     }
 
     public void onCheckedChangedInListView(ToDoItem todo) {
         this.crudOperations.updateToDoItem(todo, updated -> {
-            showFeedbackMessage("Checked changed to: " + updated.isChecked() + " for " + updated.getName());
+            this.sortListAndScrollToItem(todo, sortMethod);
         });
     }
 
     public void onFavouriteChangedInListView(ToDoItem todo) {
         this.crudOperations.updateToDoItem(todo, updated -> {
-            showFeedbackMessage("Favourtie changed to: " + updated.isFavourite() + " for " + updated.getName());
+            this.sortListAndScrollToItem(todo, sortMethod);
         });
     }
 
-    protected void readAllDataItems(Consumer<List<ToDoItem>> onread) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
+    protected void sortToDos(List<ToDoItem> todos, String sortMethod) {
+        todos.sort(Comparator.comparing(ToDoItem::isChecked).thenComparing(ToDoItem::getName));
+
+        if (sortMethod.equals("date")) {
+            todos.sort(Comparator.comparing(ToDoItem::isChecked).thenComparing(ToDoItem::getExpirationDateTime).thenComparing(todo -> !todo.isFavourite()));
+        } else if (sortMethod.equals("favourite")) {
+            todos.sort(Comparator.comparing(ToDoItem::isChecked).thenComparing(todo -> !todo.isFavourite()).thenComparing(ToDoItem::getExpirationDateTime));
+        }
+    }
+
+    protected void sortListAndScrollToItem(ToDoItem todo, String sortMethod) {
+        this.sortToDos(this.toDoItems, sortMethod);
+        this.listViewAdapter.notifyDataSetChanged();
+        if (todo != null) {
+            int pos = this.listViewAdapter.getPosition(todo);
+            this.listView.setSelection(pos);
+        }
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.sortToDosDate) {
+            this.sortMethod = "date";
+            this.sortListAndScrollToItem(null, sortMethod);
+            return true;
+        } else if (item.getItemId() == R.id.sortToDosFav) {
+            this.sortMethod = "favourite";
+            this.sortListAndScrollToItem(null, sortMethod);
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 }

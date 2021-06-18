@@ -17,6 +17,7 @@ public class ToDoItemApplication extends Application {
 
     protected static String logtag = "DataItemApplication";
     private IToDoItemCRUDOperations crudOperations;
+    private boolean serverAvailable;
 
     @Override
     public void onCreate() {
@@ -29,6 +30,7 @@ public class ToDoItemApplication extends Application {
                 Log.e(logtag, "Connectivity successful");
                 Toast.makeText(this, "Backend accessible, will use remote", Toast.LENGTH_SHORT).show();
                 this.crudOperations = new RetrofitRemoteToDoItemCRUDOperationsImpl();
+                this.serverAvailable = true;
             } else {
                 Log.e(logtag, "Connectivity failed");
                 Toast.makeText(this, "Backend not accessible, will use local", Toast.LENGTH_SHORT).show();
@@ -78,5 +80,13 @@ public class ToDoItemApplication extends Application {
                 conn.disconnect();
             }
         }
+    }
+
+    public boolean isServerAvailable() {
+        return serverAvailable;
+    }
+
+    public void setServerAvailable(boolean serverAvailable) {
+        this.serverAvailable = serverAvailable;
     }
 }
