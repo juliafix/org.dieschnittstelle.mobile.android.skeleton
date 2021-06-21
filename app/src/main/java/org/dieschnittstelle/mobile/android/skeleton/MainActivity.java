@@ -26,7 +26,9 @@ import org.dieschnittstelle.mobile.android.skeleton.model.ToDoItem;
 import org.dieschnittstelle.mobile.android.skeleton.model.impl.ThreadedToDoItemCRUDOperationsAsyncImpl;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 
@@ -46,12 +48,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
-        // !! Wenn Server nicht erreichbar, soll LoginActivity nicht aufgerufen werden -> muss dann in LoginActivity eingefügt werden
-        //if (!((ToDoItemApplication)getApplication()).isServerAvailable()) {
-        //    startActivity(new Intent(this, DetailViewActivity.class));
-        //    return;
-        //}
 
         setContentView(R.layout.activity_main);
         this.listView = findViewById(R.id.listView);
@@ -75,9 +71,17 @@ public class MainActivity extends AppCompatActivity {
         this.crudOperations = new ThreadedToDoItemCRUDOperationsAsyncImpl(crudExecutor, this, this.progressBar);
 
         this.crudOperations.readAllToDoItems(toDoItems -> {
+            Date current = new Date();
+            for (int i = 0; i < toDoItems.size(); i++) {
+                if (toDoItems.get(i).getExpirationDateTime() < current.getTime() && toDoItems.get(i).getExpirationDateTime() > 0) {
+                    Log.i("MainActivity", "ToDo abgelaufen: "+ toDoItems.get(i).getName());
+                }
+            }
             sortToDos(toDoItems, sortMethod);
             listViewAdapter.addAll(toDoItems);
         });
+
+
     }
 
     protected void onItemSelected(ToDoItem itemName) {

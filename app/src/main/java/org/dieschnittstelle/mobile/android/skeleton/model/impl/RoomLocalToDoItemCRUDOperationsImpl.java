@@ -58,7 +58,6 @@ public class RoomLocalToDoItemCRUDOperationsImpl implements IToDoItemCRUDOperati
         @Query("select * from todoitem")
         public List<ToDoItem> readAllToDos();
 
-        //Anzahl aus DB wie viele Items aktualisiert wurden
         @Update
         public int updateToDo(ToDoItem todo);
     }

@@ -22,18 +22,18 @@ public class ToDoItemApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Toast.makeText(this, "Checking connectivity...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Verbindungsaufbau...", Toast.LENGTH_SHORT).show();
         Future<Boolean> connectivityFuture = checkConnectivityAsync();
 
         try {
             if (connectivityFuture.get()) {
                 Log.e(logtag, "Connectivity successful");
-                Toast.makeText(this, "Backend accessible, will use remote", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Backend erreichbar. Nutzung der Webanwendung", Toast.LENGTH_SHORT).show();
                 this.crudOperations = new RetrofitRemoteToDoItemCRUDOperationsImpl();
                 this.serverAvailable = true;
             } else {
                 Log.e(logtag, "Connectivity failed");
-                Toast.makeText(this, "Backend not accessible, will use local", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Backend nicht erreichbar. Nutzung der lokalen Datenbank", Toast.LENGTH_SHORT).show();
                 this.crudOperations = new RoomLocalToDoItemCRUDOperationsImpl(this);
             }
         }

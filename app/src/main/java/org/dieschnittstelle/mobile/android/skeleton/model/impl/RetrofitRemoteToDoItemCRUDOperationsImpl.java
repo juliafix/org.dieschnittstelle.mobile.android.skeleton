@@ -2,6 +2,7 @@ package org.dieschnittstelle.mobile.android.skeleton.model.impl;
 
 import org.dieschnittstelle.mobile.android.skeleton.model.IToDoItemCRUDOperations;
 import org.dieschnittstelle.mobile.android.skeleton.model.ToDoItem;
+import org.dieschnittstelle.mobile.android.skeleton.model.User;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,6 +39,9 @@ public class RetrofitRemoteToDoItemCRUDOperationsImpl implements IToDoItemCRUDOp
 
         @DELETE("/api/todos")
         public Call<Boolean> deleteAllTodos();
+
+        @PUT("/api/users/auth")
+        public Call<Boolean> authenticateUser(@Body User user);
 
     }
 
@@ -93,6 +97,15 @@ public class RetrofitRemoteToDoItemCRUDOperationsImpl implements IToDoItemCRUDOp
     public boolean deleteToDoItem(long id) {
         try {
             return this.webAPI.deleteTodo(id).execute().body();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean authenticateUser(User user) {
+        try {
+            return this.webAPI.authenticateUser(user).execute().body();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
