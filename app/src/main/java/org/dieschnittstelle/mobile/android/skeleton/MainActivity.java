@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -71,12 +72,6 @@ public class MainActivity extends AppCompatActivity {
         this.crudOperations = new ThreadedToDoItemCRUDOperationsAsyncImpl(crudExecutor, this, this.progressBar);
 
         this.crudOperations.readAllToDoItems(toDoItems -> {
-            Date current = new Date();
-            for (int i = 0; i < toDoItems.size(); i++) {
-                if (toDoItems.get(i).getExpirationDateTime() < current.getTime() && toDoItems.get(i).getExpirationDateTime() > 0) {
-                    Log.i("MainActivity", "ToDo abgelaufen: "+ toDoItems.get(i).getName());
-                }
-            }
             sortToDos(toDoItems, sortMethod);
             listViewAdapter.addAll(toDoItems);
         });
@@ -201,6 +196,28 @@ public class MainActivity extends AppCompatActivity {
         } else if (item.getItemId() == R.id.sortToDosFav) {
             this.sortMethod = "favourite";
             this.sortListAndScrollToItem(null, sortMethod);
+            return true;
+        } else if (item.getItemId() == R.id.deleteRemoteToDos) {
+            this.crudOperations.deleteAllToDoItems(true, (result) -> {
+                if (result) {
+                    showFeedbackMessage("Alle Remote-ToDos gelöscht.");
+                    this.toDoItems.clear();
+                    this.listViewAdapter.notifyDataSetChanged();
+                } else {
+                    showFeedbackMessage("Remote-ToDos konnten nicht gelöscht werden.");
+                }
+            });
+            return true;
+        } else if (item.getItemId() == R.id.deleteLocalToDos) {
+            this.crudOperations.deleteAllToDoItems(false, (result) -> {
+                if (result) {
+                    showFeedbackMessage("Alle lokalen ToDos gelöscht.");
+                    this.toDoItems.clear();
+                    this.listViewAdapter.notifyDataSetChanged();
+                } else {
+                    showFeedbackMessage("Lokale ToDos konnten nicht gelöscht werden.");
+                }
+            });
             return true;
         } else {
             return super.onOptionsItemSelected(item);

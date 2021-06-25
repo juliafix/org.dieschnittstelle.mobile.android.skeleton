@@ -1,5 +1,7 @@
 package org.dieschnittstelle.mobile.android.skeleton.model;
 
+import android.util.Log;
+
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
@@ -130,6 +132,18 @@ public class ToDoItem implements Serializable {
         current.setMinutes(minutes);
 
         expirationDateTime = current.getTime();
+    }
+
+    public boolean isExpired() {
+        Date current = new Date();
+            if (getExpirationDateTime() < current.getTime() && getExpirationDateTime() > 0) {
+                Log.i("MainActivity", "ToDo abgelaufen: " + getName());
+                return true;
+                //TextView date = listView.getRootView().findViewById(R.id.expirationDateTime);
+                //date.setTextColor(getResources().getColor(R.color.colorAccent));
+            } else {
+                return false;
+            }
     }
 
     public ArrayList<String> getContacts() {

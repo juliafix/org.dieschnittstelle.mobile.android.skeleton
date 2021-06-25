@@ -7,6 +7,7 @@ import android.widget.Toast;
 import org.dieschnittstelle.mobile.android.skeleton.model.IToDoItemCRUDOperations;
 import org.dieschnittstelle.mobile.android.skeleton.model.impl.RetrofitRemoteToDoItemCRUDOperationsImpl;
 import org.dieschnittstelle.mobile.android.skeleton.model.impl.RoomLocalToDoItemCRUDOperationsImpl;
+import org.dieschnittstelle.mobile.android.skeleton.model.impl.SyncedToDoItemCURDOperationsImpl;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -15,7 +16,7 @@ import java.util.concurrent.Future;
 
 public class ToDoItemApplication extends Application {
 
-    protected static String logtag = "DataItemApplication";
+    protected static String logtag = "ToDoItemApplication";
     private IToDoItemCRUDOperations crudOperations;
     private boolean serverAvailable;
 
@@ -29,7 +30,7 @@ public class ToDoItemApplication extends Application {
             if (connectivityFuture.get()) {
                 Log.e(logtag, "Connectivity successful");
                 Toast.makeText(this, "Backend erreichbar. Nutzung der Webanwendung", Toast.LENGTH_SHORT).show();
-                this.crudOperations = new RetrofitRemoteToDoItemCRUDOperationsImpl();
+                this.crudOperations = new SyncedToDoItemCURDOperationsImpl(new RoomLocalToDoItemCRUDOperationsImpl(this), new RetrofitRemoteToDoItemCRUDOperationsImpl());
                 this.serverAvailable = true;
             } else {
                 Log.e(logtag, "Connectivity failed");

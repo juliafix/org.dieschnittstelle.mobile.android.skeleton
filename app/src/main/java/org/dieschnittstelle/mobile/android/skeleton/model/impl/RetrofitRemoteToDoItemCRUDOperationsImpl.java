@@ -111,4 +111,13 @@ public class RetrofitRemoteToDoItemCRUDOperationsImpl implements IToDoItemCRUDOp
             return false;
         }
     }
+
+    public boolean deleteAllToDoItems(boolean remote) {
+        try {
+            return this.webAPI.deleteAllTodos().execute().body();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

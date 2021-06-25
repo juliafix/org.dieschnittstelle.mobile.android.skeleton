@@ -13,5 +13,7 @@ public interface IToDoItemCRUDOperations {
     public ToDoItem updateToDoItem(ToDoItem todo);
 
     public boolean deleteToDoItem (long id);
+
+    public boolean deleteAllToDoItems(boolean remote);
 }
 

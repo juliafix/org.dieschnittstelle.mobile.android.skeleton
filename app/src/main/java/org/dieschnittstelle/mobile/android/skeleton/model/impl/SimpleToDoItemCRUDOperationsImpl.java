@@ -46,4 +46,9 @@ public class SimpleToDoItemCRUDOperationsImpl implements IToDoItemCRUDOperations
     public boolean deleteToDoItem(long id) {
         return false;
     }
+
+    @Override
+    public boolean deleteAllToDoItems(boolean remote) {
+        return false;
+    }
 }

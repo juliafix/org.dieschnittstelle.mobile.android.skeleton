@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.room.Dao;
 import androidx.room.Database;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Room;
@@ -60,6 +61,9 @@ public class RoomLocalToDoItemCRUDOperationsImpl implements IToDoItemCRUDOperati
 
         @Update
         public int updateToDo(ToDoItem todo);
+
+        @Delete
+        public void deleteAllToDos(List<ToDoItem> toDoItems);
     }
 
     private RoomToDoItemCRUDAccess roomAccessor;
@@ -100,5 +104,15 @@ public class RoomLocalToDoItemCRUDOperationsImpl implements IToDoItemCRUDOperati
     @Override
     public boolean deleteToDoItem(long id) {
         return false;
+    }
+
+    @Override
+    public boolean deleteAllToDoItems(boolean remote) {
+        if (remote) {
+            return false;
+        } else {
+            roomAccessor.deleteAllToDos(roomAccessor.readAllToDos());
+            return true;
+        }
     }
 }

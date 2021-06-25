@@ -2,8 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:title="Optionen" android:id="@+id/empty" android:icon="@drawable/outline_more_vert_24" app:showAsAction="always">
         <menu>
-            <item android:title="Nach Datum und Relevanz sortieren" android:id="@+id/sortToDosDate" app:showAsAction="ifRoom"/>
-            <item android:title="Nach Relevanz und Datum sortieren" android:id="@+id/sortToDosFav" app:showAsAction="ifRoom"/>
+            <item android:title="Nach Datum und Relevanz sortieren" android:id="@+id/sortToDosDate" app:showAsAction="never"/>
+            <item android:title="Nach Relevanz und Datum sortieren" android:id="@+id/sortToDosFav" app:showAsAction="never"/>
+            <item android:title="Alle Remote-ToDos löschen" android:id="@+id/deleteRemoteToDos" app:showAsAction="never"/>
+            <item android:title="Alle lokalen ToDos löschen" android:id="@+id/deleteLocalToDos" app:showAsAction="never"/>
         </menu>
     </item>
 </menu>

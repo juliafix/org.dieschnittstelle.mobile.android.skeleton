@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -131,11 +132,22 @@ public class LoginActivity extends AppCompatActivity {
             this.uiThreadProvider.runOnUiThread(() -> {
                 progressDialog.setMessage("Login-Daten werden überprüft...");
                 progressDialog.show();
+
+                new CountDownTimer(2000, 1000) {
+
+                    public void onTick(long millisUntilFinished) {
+
+                    }
+
+                    public void onFinish() {
+                        progressDialog.dismiss();
+                    }
+                }.start();
+
             });
 
             RetrofitRemoteToDoItemCRUDOperationsImpl retrofit = new RetrofitRemoteToDoItemCRUDOperationsImpl();
             boolean userAuthenticated = retrofit.authenticateUser(user);
-            progressDialog.dismiss();
 
             if (userAuthenticated) {
                 startActivity(new Intent(this, MainActivity.class));

@@ -13,5 +13,7 @@ public interface IToDoItemCRUDOperationsAsync {
 
     public void updateToDoItem(ToDoItem todo, Consumer<ToDoItem> onupdated);
 
-    public void deleteToDoItem (long id, Consumer<Boolean> ondeleted) ;
+    public void deleteToDoItem(long id, Consumer<Boolean> ondeleted) ;
+
+    public void deleteAllToDoItems(boolean remote, Consumer<Boolean> ondeleted);
 }
