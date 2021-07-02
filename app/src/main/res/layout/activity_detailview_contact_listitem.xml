@@ -29,8 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:onClick="messageContact"/>
+            android:layout_marginRight="10dp"/>
 
         <ImageView android:id="@+id/deleteContact"
             android:src="@drawable/ic_baseline_delete_grey_24"

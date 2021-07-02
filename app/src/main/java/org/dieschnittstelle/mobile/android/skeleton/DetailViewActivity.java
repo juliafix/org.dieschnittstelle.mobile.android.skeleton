@@ -115,7 +115,6 @@ public class DetailViewActivity extends AppCompatActivity {
 
     protected void deleteToDo() {
                 AlertDialog deleteContact = new AlertDialog.Builder(this)
-                // set message, title, and icon
                 .setTitle("ToDo löschen")
                 .setMessage("Möchtest du das ToDo " + "'" + todo.getName() + "'" +  " wirklich löschen?")
 
@@ -219,7 +218,6 @@ public class DetailViewActivity extends AppCompatActivity {
 
             }
 
-
             contacts.add(newContact);
             Log.i("DetailViewActivity", "E-Mail gefunden: " + displayName);
         }
@@ -233,10 +231,11 @@ public class DetailViewActivity extends AppCompatActivity {
         DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                boolean dateWasZero = todo.getExpirationDateTime() == 0;
+
                 todo.setDate(dayOfMonth, month, year);
                 dateTimeText.setText(todo.getExpirationDateTimeString());
-                openTimePicker(view);
-
+                openTimePicker(view, dateWasZero);
             }
         };
 
@@ -260,27 +259,14 @@ public class DetailViewActivity extends AppCompatActivity {
         datePickerDialog = new DatePickerDialog(this, style, dateSetListener, year, month, day);
     }
 
-    private String getTodaysDate() {
-        Calendar cal = Calendar.getInstance();
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH);
-        month = month + 1;
-        int day = cal.get(Calendar.DAY_OF_MONTH);
-        return makeDateString(day, month, year);
-    }
-
-    private String makeDateString(int dayOfMonth, int month, int year) {
-        return dayOfMonth + "." + month + "." + year;
-    }
-
     public void openDatePicker(View view) {
         datePickerDialog.show();
     }
 
-    public void openTimePicker(View view) {
+    public void openTimePicker(View view, boolean dateWasZero) {
         int hour;
         int min;
-        if (todo.getExpirationDateTime() == 0) {
+        if (dateWasZero == true) {
             Calendar calendar = Calendar.getInstance();
             hour = calendar.get(Calendar.HOUR_OF_DAY);
             min = calendar.get(Calendar.MINUTE);

@@ -51,57 +51,63 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
             View inflatedView = View.inflate(controller, layoutResource, viewGroup);
             TextView textView = (TextView) inflatedView.findViewById(R.id.rowContactsView);
             textView.setText(currentContact.getName());
-
-            //Action for SMS contact
             ImageView imageViewCall = (ImageView) inflatedView.findViewById(R.id.messageButton);
-            imageViewCall.setOnClickListener(v -> {
-                if (currentContact.getNumbers().size() == 1 && currentContact.getNumbers() != null) {
-                    Intent smsIntent = new Intent(Intent.ACTION_SENDTO);
-                    smsIntent.setData(Uri.parse("smsto:" + currentContact.getNumbers().get(0)));
-                    smsIntent.putExtra("sms_body", controller.getTodo().getName() + ": " + controller.getTodo().getDescription());
-                    controller.startActivity(smsIntent);
-                } else if (currentContact.getNumbers().size() > 1 && currentContact.getNumbers() != null) {
-                    String[] type = new String[0];
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(controller);
-                    String[] selectedItem = {""};
-
-                    builder.setTitle("Nummer auswählen:");
-
-                    final List<String> numbers = currentContact.getNumbers();
-
-                    builder.setSingleChoiceItems(
-                            (String[]) numbers.toArray(type),
-                            -1,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    selectedItem[0] = numbers.get(i);
-
-                                }
-                            });
-
-                    builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            Intent smsIntent = new Intent(Intent.ACTION_SENDTO);
-                            smsIntent.setData(Uri.parse("smsto:" + currentContact.getNumbers().get(0)));
-                            smsIntent.putExtra("sms_body", controller.getTodo().getName() + ": " + controller.getTodo().getDescription());
-                            controller.startActivity(smsIntent);
-                        }
-                    });
-
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                } else {
-                    Toast.makeText(getContext(), "Keine Nummer hinterlegt", Toast.LENGTH_SHORT).show();
-                }
-
-            });
-
-            //Action for E-Mail contact
             ImageView imageViewMessage = (ImageView) inflatedView.findViewById(R.id.mailButton);
+
+            if (currentContact.getNumbers() == null) {
+                imageViewCall.setVisibility(view.INVISIBLE);
+            }
+                //Action for SMS contact
+                imageViewCall.setOnClickListener(v -> {
+                    if (currentContact.getNumbers() != null && currentContact.getNumbers().size() == 1) {
+                        Intent smsIntent = new Intent(Intent.ACTION_SENDTO);
+                        smsIntent.setData(Uri.parse("smsto:" + currentContact.getNumbers().get(0)));
+                        smsIntent.putExtra("sms_body", controller.getTodo().getName() + ": " + controller.getTodo().getDescription());
+                        controller.startActivity(smsIntent);
+                    } else if (currentContact.getNumbers() != null && currentContact.getNumbers().size() > 1) {
+                        String[] type = new String[0];
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(controller);
+                        String[] selectedItem = {""};
+
+                        builder.setTitle("Nummer auswählen:");
+
+                        final List<String> numbers = currentContact.getNumbers();
+
+                        builder.setSingleChoiceItems(
+                                (String[]) numbers.toArray(type),
+                                -1,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        selectedItem[0] = numbers.get(i);
+
+                                    }
+                                });
+
+                        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Intent smsIntent = new Intent(Intent.ACTION_SENDTO);
+                                smsIntent.setData(Uri.parse("smsto:" + currentContact.getNumbers().get(0)));
+                                smsIntent.putExtra("sms_body", controller.getTodo().getName() + ": " + controller.getTodo().getDescription());
+                                controller.startActivity(smsIntent);
+                            }
+                        });
+
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    } else {
+                        Toast.makeText(getContext(), "Keine Nummer hinterlegt", Toast.LENGTH_SHORT).show();
+                    }
+
+                });
+
+            if (currentContact.getEmails() == null) {
+                imageViewMessage.setVisibility(view.INVISIBLE);
+            }
+            //Action for E-Mail contact
             imageViewMessage.setOnClickListener(v -> {
-                if (currentContact.getEmails().size() == 1 && currentContact.getEmails() != null) {
+                if (currentContact.getEmails() != null && currentContact.getEmails().size() == 1) {
                     Intent email = new Intent(Intent.ACTION_SEND);
                     email.putExtra(Intent.EXTRA_EMAIL, new String[]{currentContact.getEmails().get(0)});
                     email.putExtra(Intent.EXTRA_SUBJECT, controller.getTodo().getName());
@@ -109,7 +115,7 @@ public class ContactsAdapter extends ArrayAdapter<Contact> {
                     email.setType("message/rfc822");
                     controller.startActivity(Intent.createChooser(email, "Wähle einen E-Mail Client :"));
 
-                } else if (currentContact.getEmails().size() > 1 && currentContact.getEmails() != null) {
+                } else if (currentContact.getEmails() != null && currentContact.getEmails().size() > 1) {
                     String[] type = new String[0];
                     final AlertDialog.Builder builder = new AlertDialog.Builder(controller);
                     String[] selectedItem = {""};
