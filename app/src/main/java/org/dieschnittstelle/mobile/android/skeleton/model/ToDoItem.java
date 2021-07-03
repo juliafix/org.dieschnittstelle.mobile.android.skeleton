@@ -1,7 +1,5 @@
 package org.dieschnittstelle.mobile.android.skeleton.model;
 
-import android.util.Log;
-
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
@@ -20,12 +18,6 @@ import java.util.Objects;
 @Entity
 @TypeConverters(DateConverter.class)
 public class ToDoItem implements Serializable {
-
-    protected static long ID_GENERATOR = 0;
-
-    public static long nextId() {
-        return ++ID_GENERATOR;
-    }
 
     private String name;
     private String description;
@@ -111,7 +103,7 @@ public class ToDoItem implements Serializable {
 
     public String getExpirationDateTimeString() {
         if (expirationDateTime == 0) {
-            return "-";
+            return "";
         }
         SimpleDateFormat datetimeformatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         return datetimeformatter.format(new Date(expirationDateTime)) + " Uhr";
@@ -137,10 +129,7 @@ public class ToDoItem implements Serializable {
     public boolean isExpired() {
         Date current = new Date();
             if (getExpirationDateTime() < current.getTime() && getExpirationDateTime() > 0) {
-                Log.i("MainActivity", "ToDo abgelaufen: " + getName());
                 return true;
-                //TextView date = listView.getRootView().findViewById(R.id.expirationDateTime);
-                //date.setTextColor(getResources().getColor(R.color.colorAccent));
             } else {
                 return false;
             }

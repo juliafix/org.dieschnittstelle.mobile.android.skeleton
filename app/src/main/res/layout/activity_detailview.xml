@@ -60,21 +60,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="start"
-                android:lines="10"
-                android:minLines="5"
-                android:singleLine="true" />
+                android:lines="4"
+                android:minLines="4"
+                android:singleLine="false" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/itemExpirationDateWrapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Fälligkeitsdatum und Zeit"
+            android:hint="Fälligkeitsdatum und Uhrzeit"
             app:hintEnabled="true"
             app:layout_constraintTop_toBottomOf="@id/itemDescriptionWrapper">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/itemExpirationDateTime"
+                android:textColor="@{controller.todo.isExpired == true ? @color/expired : @color/textColor}"
                 android:text="@{controller.todo.expirationDateTimeString}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -86,6 +87,8 @@
 
             <Button
                 android:id="@+id/dateButton"
+                android:backgroundTint="@color/colorPrimary"
+                android:textColor="@color/white"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Datum und Uhrzeit wählen"

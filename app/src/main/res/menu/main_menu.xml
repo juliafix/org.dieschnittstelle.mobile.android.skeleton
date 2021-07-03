@@ -6,6 +6,7 @@
             <item android:title="Nach Relevanz und Datum sortieren" android:id="@+id/sortToDosFav" app:showAsAction="never"/>
             <item android:title="Alle Remote-ToDos löschen" android:id="@+id/deleteRemoteToDos" app:showAsAction="never"/>
             <item android:title="Alle lokalen ToDos löschen" android:id="@+id/deleteLocalToDos" app:showAsAction="never"/>
+            <item android:title="ToDos synchronisieren" android:id="@+id/syncToDos" app:showAsAction="never"/>
         </menu>
     </item>
 </menu>

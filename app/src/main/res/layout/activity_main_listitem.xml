@@ -68,7 +68,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:textColor="@{item.isExpired == true ? @color/colorAccent : @color/colorPrimaryDark}"
+                android:textColor="@{item.isExpired == true ? @color/expired : @color/textColor}"
                 android:id="@+id/expirationDateTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

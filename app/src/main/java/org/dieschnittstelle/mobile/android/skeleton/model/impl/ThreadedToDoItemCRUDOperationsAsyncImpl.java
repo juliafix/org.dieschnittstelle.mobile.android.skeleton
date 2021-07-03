@@ -45,7 +45,6 @@ public class ThreadedToDoItemCRUDOperationsAsyncImpl implements IToDoItemCRUDOpe
 
             uiThreadProvider.runOnUiThread(() -> {
                 this.progressBar.setVisibility(View.GONE);
-                //this.listViewAdapter.addAll(todos);
                 onread.accept(todos);
             });
         }).start();
@@ -78,6 +77,20 @@ public class ThreadedToDoItemCRUDOperationsAsyncImpl implements IToDoItemCRUDOpe
         new Thread(() -> {
             boolean deleted = crudExecutor.deleteAllToDoItems(remote);
             this.uiThreadProvider.runOnUiThread(() -> ondeleted.accept(deleted));
+        }).start();
+    }
+
+    @Override
+    public void syncToDoItems(Consumer<List<ToDoItem>> onread) {
+        new Thread(() -> {
+            if (crudExecutor instanceof SyncedToDoItemCURDOperationsImpl) {
+                ((SyncedToDoItemCURDOperationsImpl) crudExecutor).syncLocalAndRemote();
+                List<ToDoItem> todos = crudExecutor.readAllToDoItems();
+
+                uiThreadProvider.runOnUiThread(() -> {
+                    onread.accept(todos);
+                });
+            }
         }).start();
     }
 }

@@ -242,7 +242,6 @@ public class DetailViewActivity extends AppCompatActivity {
         int year;
         int month;
         int day;
-        int style = AlertDialog.THEME_HOLO_LIGHT;
 
         if (todo.getExpirationDateTime() == 0) {
             Calendar cal = Calendar.getInstance();
@@ -256,7 +255,7 @@ public class DetailViewActivity extends AppCompatActivity {
             year = current.getYear() + 1900;
         }
 
-        datePickerDialog = new DatePickerDialog(this, style, dateSetListener, year, month, day);
+        datePickerDialog = new DatePickerDialog(this, R.style.DialogTheme, dateSetListener, year, month, day);
     }
 
     public void openDatePicker(View view) {

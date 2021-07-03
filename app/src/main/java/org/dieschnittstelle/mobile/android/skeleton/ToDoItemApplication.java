@@ -87,7 +87,4 @@ public class ToDoItemApplication extends Application {
         return serverAvailable;
     }
 
-    public void setServerAvailable(boolean serverAvailable) {
-        this.serverAvailable = serverAvailable;
-    }
 }

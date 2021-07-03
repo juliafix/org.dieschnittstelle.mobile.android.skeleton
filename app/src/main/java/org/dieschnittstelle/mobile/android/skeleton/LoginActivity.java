@@ -31,6 +31,8 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginButton;
     private Activity uiThreadProvider;
     private ProgressDialog progressDialog;
+    private boolean pwdCorrect = false;
+    private boolean emailCorrect = false;
 
 
     @Override
@@ -58,6 +60,16 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 emailInput.setError(null);
+                if (!TextUtils.isEmpty(s) && Patterns.EMAIL_ADDRESS.matcher(s).matches()) {
+                    emailCorrect = true;
+                    user.setEmail(s.toString());
+                    if (emailCorrect && pwdCorrect) {
+                        loginButton.setEnabled(true);
+                    }
+                } else {
+                    emailCorrect = false;
+                    loginButton.setEnabled(false);
+                }
             }
 
             @Override
@@ -78,6 +90,16 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 pwdInput.setError(null);
+                if (!TextUtils.isEmpty(s) && s.length() == 6) {
+                    pwdCorrect = true;
+                    user.setPwd(s.toString());
+                    if (emailCorrect && pwdCorrect) {
+                        loginButton.setEnabled(true);
+                    }
+                } else {
+                    pwdCorrect = false;
+                    loginButton.setEnabled(false);
+                }
             }
 
             @Override
@@ -95,11 +117,13 @@ public class LoginActivity extends AppCompatActivity {
             if (!TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                 emailInput.setError(null);
                 user.setEmail(email);
-                checkUser();
+                this.emailCorrect = true;
             } else if (TextUtils.isEmpty(email)) {
                 emailInput.setError("Bitte gib eine E-Mail Adresse ein");
+                this.emailCorrect = false;
             } else {
                 emailInput.setError("Bitte gib eine gültige E-Mail Adresse ein");
+                this.emailCorrect = false;
             }
         }
     }
@@ -110,18 +134,14 @@ public class LoginActivity extends AppCompatActivity {
             if (!TextUtils.isEmpty(password) && password.length() == 6) {
                 pwdInput.setError(null);
                 user.setPwd(password);
-                checkUser();
+                this.pwdCorrect = true;
             } else if (TextUtils.isEmpty(password)) {
                 pwdInput.setError("Bitte gib ein Passwort ein");
+                this.pwdCorrect = false;
             } else {
                 pwdInput.setError("Bitte gib ein Passwort mit genau 6 Zeichen ein");
+                this.pwdCorrect = false;
             }
-        }
-    }
-
-    protected void checkUser() {
-        if (user.getEmail() != null && user.getPwd() != null) {
-            loginButton.setEnabled(true);
         }
     }
 

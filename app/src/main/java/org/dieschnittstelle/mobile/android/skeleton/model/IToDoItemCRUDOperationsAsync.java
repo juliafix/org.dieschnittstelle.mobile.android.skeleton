@@ -16,4 +16,6 @@ public interface IToDoItemCRUDOperationsAsync {
     public void deleteToDoItem(long id, Consumer<Boolean> ondeleted) ;
 
     public void deleteAllToDoItems(boolean remote, Consumer<Boolean> ondeleted);
+
+    void syncToDoItems(Consumer<List<ToDoItem>> onread);
 }
