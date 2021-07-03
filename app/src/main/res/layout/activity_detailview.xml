@@ -75,7 +75,7 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/itemExpirationDateTime"
-                android:textColor="@{controller.todo.isExpired == true ? @color/expired : @color/textColor}"
+                android:textColor="@{controller.todo.isExpired == true ? @color/expired : @color/black}"
                 android:text="@{controller.todo.expirationDateTimeString}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -87,8 +87,6 @@
 
             <Button
                 android:id="@+id/dateButton"
-                android:backgroundTint="@color/colorPrimary"
-                android:textColor="@color/white"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Datum und Uhrzeit wählen"

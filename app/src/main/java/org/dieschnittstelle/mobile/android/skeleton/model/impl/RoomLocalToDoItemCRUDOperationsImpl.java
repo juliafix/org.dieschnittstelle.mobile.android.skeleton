@@ -64,6 +64,9 @@ public class RoomLocalToDoItemCRUDOperationsImpl implements IToDoItemCRUDOperati
 
         @Delete
         public void deleteAllToDos(List<ToDoItem> toDoItems);
+
+        @Delete
+        public void deleteToDo(ToDoItem todo);
     }
 
     private RoomToDoItemCRUDAccess roomAccessor;
@@ -103,6 +106,11 @@ public class RoomLocalToDoItemCRUDOperationsImpl implements IToDoItemCRUDOperati
 
     @Override
     public boolean deleteToDoItem(long id) {
+        ToDoItem item = roomAccessor.readAllToDos().stream()
+                .filter(toDoItem -> toDoItem.getId() == id)
+                .findFirst()
+                .get();
+        roomAccessor.deleteToDo(item);
         return false;
     }
 

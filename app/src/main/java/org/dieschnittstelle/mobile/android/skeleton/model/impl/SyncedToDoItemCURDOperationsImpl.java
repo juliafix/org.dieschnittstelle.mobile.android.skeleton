@@ -46,7 +46,9 @@ public class SyncedToDoItemCURDOperationsImpl implements IToDoItemCRUDOperations
 
     @Override
     public boolean deleteToDoItem(long id) {
-        return false;
+        localCRUD.deleteToDoItem(id);
+        remoteCRUD.deleteToDoItem(id);
+        return true;
     }
 
     @Override
